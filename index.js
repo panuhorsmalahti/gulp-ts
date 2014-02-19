@@ -37,25 +37,23 @@ var tsPlugin = function(options) {
 
     // Compile all files defined in the files Array
     compileFiles = function() {
-        var compileCmd = files.join(' ');
-
-        console.log("Compiling " + compileCmd);
+        var compileCmd = ' ' + files.join(' ');
 
         // Basic options
         if (options.sourceMap) {
-            compileCmd += " --sourcemap";
+            compileCmd += ' --sourcemap';
         }
         if (options.declaration) {
-            compileCmd += " --declaration";
+            compileCmd += ' --declaration';
         }
         if (options.removeComments) {
-            compileCmd += "--removeComments";
+            compileCmd += ' --removeComments';
         }
         if (options.noImplicitAny) {
-            compileCmd += "--noImplicitAny";
+            compileCmd += ' --noImplicitAny';
         }
         if (options.noResolve) {
-            compileCmd += "--noResolve";
+            compileCmd += ' --noResolve';
         }
 
         // Module
@@ -72,7 +70,7 @@ var tsPlugin = function(options) {
         // Output directory
         if (options.outDir) {
             if (options.out) {
-                console.log("Warning: Don't use out with outDir!");
+                console.log('Warning: Don\'t use out with outDir!');
             }
             compileCmd += ' --outDir ' + options.outDir;
         }
