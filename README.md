@@ -41,7 +41,7 @@ Supports the following options.
   module : 'amd',
 
   // Specify ECMAScript target version: 'ES3' (default), or 'ES5'
-  target : 'ES3', // or 'ES5'
+  target : 'ES3',
 
   // Concatenate and emit output to single file.
   out : '', // output file name
