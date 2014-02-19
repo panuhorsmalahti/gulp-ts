@@ -24,7 +24,6 @@
   "dependencies": {},
   "analyze": true,
   "devDependencies": {
-    "mocha": "~1.17.1",
     "gulp": "~3.5.2",
     "gulp-util": "~2.2.14",
     "typescript": "~0.9.5",
