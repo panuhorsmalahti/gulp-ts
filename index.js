@@ -6,12 +6,13 @@ var gutil = require('gulp-util');
 var PluginError = gutil.PluginError;
 var through = require('through');
 var shell = require('shelljs');
+var path = require('path');
 
 "use strict";
 
 
 var tsPlugin = function(options) {
-    var tscPath = 'node_modules/typescript/bin/tsc',
+    var tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
         bufferFiles,
         compileFiles,
         files = [];
