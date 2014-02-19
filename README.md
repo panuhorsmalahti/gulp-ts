@@ -3,13 +3,21 @@ gulp-ts
 
 TypeScript compiler plugin for Gulp.
 
+First install gulp-ts
+```shell
+npm install --save-dev gulp-ts
+```
+
+
 Usage:
 ```javascript
 var ts = require('gulp-ts');
 
 // ...
-gulp.src('test.ts')
- .pipe(ts());
+gulp.task('typescript', function() {
+  gulp.src('source.ts')
+    .pipe(ts());
+}
 ```
 Supports the following options.
 ```javascript
