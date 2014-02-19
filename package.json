@@ -1,0 +1,35 @@
+{
+  "name": "gulp-ts",
+  "preferGlobal": false,
+  "version": "0.0.1",
+  "author": "Panu Horsmalahti <panu.horsmalahti@iki.fi>",
+  "description": "TypeScript compiler Gulp plugin",
+  "contributors": [
+    {
+      "name": "Panu Horsmalahti",
+      "email": "panu.horsmalahti@iki.fi"
+    }
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/panuhorsmalahti/gulp-ts.git"
+  },
+  "keywords": [
+    "gulp",
+    "typescript",
+    "plugin",
+    "ts"
+  ],
+  "dependencies": {},
+  "analyze": true,
+  "devDependencies": {
+    "mocha": "~1.17.1",
+    "gulp": "~3.5.2",
+    "gulp-util": "~2.2.14"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10"
+  }
+}
