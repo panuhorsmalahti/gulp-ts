@@ -17,6 +17,7 @@ var tsPlugin = function (options) {
         return cb(new PluginError('gulp-ts', 'Streaming not supported'));
       }
 
+      var source = file.contents.toString('utf8');
       
 
     });
