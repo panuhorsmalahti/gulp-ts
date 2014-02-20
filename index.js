@@ -44,22 +44,30 @@ var tsPlugin = function(options) {
             return this.emit('error', new PluginError('gulp-ts',  'Streaming not supported'));
         }
 
+        // Using path.relative doesn't seem safe, but we need the relative path
+        // to the 'base', e.g. if we have 'a.ts' and 'b/b.ts' from src, the relative
+        // property tells the path from cwd to path.
+        file.relativePath = path.relative(file.cwd, file.path)
+
         // Add file to the list of source files
-        files.push(file.path);
+        files.push(file);
     };
 
     // Compile all files defined in the files Array
     compileFiles = function() {
             // Construct a compile command to be used with the shell TypeScript compiler
-        var compileCmd = ' ' + files.join(' '),
+        var compileCmd = '',
             // Files are compiled in this sub-directory
             compiledir = 'compiledir',
             // Path to the TypeScript binary
             tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
-            // The result of the compilation shell execution
-            compileSuccess,
             // ES6 plz
             that = this;
+
+        // Add source file full paths to the compile command
+        files.forEach(function (file) {
+            compileCmd += ' ' + file.path;
+        });
 
         // Basic options
         if (options.sourceMap) {
@@ -117,31 +125,49 @@ var tsPlugin = function(options) {
             console.log("Compiling..");
 
             // shell.exec returns { code: , output: }
-            compileSuccess = shell.exec('node ' + tscPath + compileCmd).code;
-            console.log("success " + JSON.stringify(compileSuccess) + " " + compileCmd);
-
-            // Read output files
-            files.forEach(function (file) {
-                
-            });
-
-            // Remove the resulting files
-            rmdir(path.join(__dirname, compiledir), function (err) {
-                if (err) {
-                    throw err;
+            // silent is set to true to prevent console output
+            shell.exec('node ' + tscPath + compileCmd, { silent: true }, function (code, output) {
+                if (code) {
+                    return that.emit('error', new PluginError('gulp-ts',
+                        'Error during compilation!\n\n' + output));
                 }
 
-                // Return buffers
-                that.emit('data', null);
-                that.emit('end');
+                // Read output files
+                files.forEach(function (file) {
+                    // Read from compiledir and replace .ts -> .js
+                    fs.readFile(path.join(__dirname, compiledir, file.relativePath.replace(".ts", ".js")), function (err, data) {
+                        // Read failed
+                        if (err) {
+                            throw err;
+                        }
+
+                        console.log("//cwd " + file.cwd + " //base " +
+                            path.dirname(path.join(file.cwd, file.relativePath)) +
+                            ' //path' + path.join(file.cwd, file.relativePath.replace(".ts", ".js")));
+                        that.push(new File({
+                            cwd: file.cwd,
+                            base: path.dirname(path.join(file.cwd, file.relativePath)),
+                            path: path.join(file.cwd, file.relativePath.replace(".ts", ".js")),
+                            contents: data
+                        }));
+                    });
+                });
+
+                // Remove the resulting files
+                rmdir(path.join(__dirname, compiledir), function (err) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    // Return buffers
+                    that.emit('end');
+                });
             });
         });
     };
 
-
     // bufferFiles is executed once per each file, compileFiles is called once at the end
     return through(bufferFiles, compileFiles);
 };
-
 
 module.exports = tsPlugin;
