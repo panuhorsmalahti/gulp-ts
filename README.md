@@ -18,7 +18,8 @@ var ts = require('gulp-ts');
 // ...
 gulp.task('typescript', function() {
   gulp.src('source.ts')
-    .pipe(ts());
+    .pipe(ts())
+    .pipe(gulp.dest('out'));
 }
 ```
 Supports the following options.
