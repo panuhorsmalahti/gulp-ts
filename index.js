@@ -62,7 +62,9 @@ var tsPlugin = function(options) {
             // Path to the TypeScript binary
             tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
             // ES6 plz
-            that = this;
+            that = this,
+            // The number of files read and pushed as File objects
+            filesRead = 0;
 
         // Add source file full paths to the compile command
         files.forEach(function (file) {
@@ -148,17 +150,23 @@ var tsPlugin = function(options) {
                             path: path.join(file.cwd, file.relativePath.replace(".ts", ".js")),
                             contents: data
                         }));
+
+                        // Increase counter
+                        filesRead++;
+
+                        // Last file has been read, and the directory can be cleaned out
+                        // This assumes that the task is 
+                        if (filesRead === files.length) {
+                            rmdir(path.join(__dirname, compiledir), function (err) {
+                                if (err) {
+                                    throw err;
+                                }
+
+                                // Return buffers
+                                that.emit('end');
+                            });
+                        }
                     });
-                });
-
-                // Remove the resulting files
-                rmdir(path.join(__dirname, compiledir), function (err) {
-                    if (err) {
-                        throw err;
-                    }
-
-                    // Return buffers
-                    that.emit('end');
                 });
             });
         });

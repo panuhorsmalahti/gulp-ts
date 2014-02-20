@@ -8,7 +8,7 @@ var ts = require('../index');
 gulp.task('default', function(){
       gulp.src(['hello.ts', 'subfolder/hello3.ts'])
         .pipe(ts({
-            module: 'amd',
+            module: 'commonjs',
             removeComments: true
         }))
         .pipe(gulp.dest('out'));;
