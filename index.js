@@ -141,12 +141,10 @@ var tsPlugin = function(options) {
                             throw err;
                         }
 
-                        console.log("//cwd " + file.cwd + " //base " +
-                            path.dirname(path.join(file.cwd, file.relativePath)) +
-                            ' //path' + path.join(file.cwd, file.relativePath.replace(".ts", ".js")));
+                        // Bug: Gulp flattens the output directory
                         that.push(new File({
                             cwd: file.cwd,
-                            base: path.dirname(path.join(file.cwd, file.relativePath)),
+                            base: file.base,
                             path: path.join(file.cwd, file.relativePath.replace(".ts", ".js")),
                             contents: data
                         }));
