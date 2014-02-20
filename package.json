@@ -29,7 +29,9 @@
     "gulp-util": "~2.2.14"
   },
   "analyze": true,
-  "devDependencies": {},
+  "devDependencies": {
+    "rimraf": "~2.2.6"
+  },
   "license": "MIT",
   "engines": {
     "node": ">=0.10"

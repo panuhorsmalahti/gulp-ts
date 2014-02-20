@@ -1,19 +1,31 @@
 /*jslint node:true */
+/*jslint nomen: true */
 
 // Requires
-var map = require('map-stream');
+
+// Native
+var fs = require('fs');
+var path = require('path');
+
+// Gulp
 var gutil = require('gulp-util');
 var PluginError = gutil.PluginError;
+var File = gutil.File;
+
+var map = require('map-stream');
 var through = require('through');
 var shell = require('shelljs');
-var path = require('path');
+
+var es = require('event-stream');
+
+// rm -rf for Node.js
+var rmdir = require('rimraf');
 
 "use strict";
 
 
 var tsPlugin = function(options) {
-    var tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
-        bufferFiles,
+    var bufferFiles,
         compileFiles,
         files = [];
 
@@ -38,7 +50,16 @@ var tsPlugin = function(options) {
 
     // Compile all files defined in the files Array
     compileFiles = function() {
-        var compileCmd = ' ' + files.join(' ');
+            // Construct a compile command to be used with the shell TypeScript compiler
+        var compileCmd = ' ' + files.join(' '),
+            // Files are compiled in this sub-directory
+            compiledir = 'compiledir',
+            // Path to the TypeScript binary
+            tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
+            // The result of the compilation shell execution
+            compileSuccess,
+            // ES6 plz
+            that = this;
 
         // Basic options
         if (options.sourceMap) {
@@ -63,18 +84,17 @@ var tsPlugin = function(options) {
         // Target ES3/ES5
         compileCmd += ' --target ' + (options.target || 'ES3').toUpperCase();
 
+        // Not supported yet.
         // Output file
-        if (options.out) {
+        /* if (options.out) {
             compileCmd += ' --out ' + options.out;
-        }
+        } */
 
-        // Output directory
-        if (options.outDir) {
-            if (options.out) {
-                console.log('Warning: Don\'t use out with outDir!');
-            }
-            compileCmd += ' --outDir ' + options.outDir;
-        }
+        // Compile all files to output directory. After compilation they're read to
+        // memory and the directory is destroyed. The reason for this 'hack' is that the
+        // TypeScript compiler doesn't easily support in-memory compilation.
+        // The use of --outDir for other means doesn't seem necessary.
+        compileCmd += ' --outDir ' + path.join(__dirname, compiledir);
 
         // Source root
         if (options.sourceRoot) {
@@ -86,10 +106,40 @@ var tsPlugin = function(options) {
             compileCmd += ' --mapRoot' + options.mapRoot;
         }
 
-        var compileSuccess = shell.exec('node ' + tscPath + compileCmd)
+        // Remove compiledir if it already exists
+        rmdir(path.join(__dirname, compiledir), function (err) {
+            // Remove failed
+            if (err) {
+                throw err;
+            }
+
+            // Compile
+            console.log("Compiling..");
+
+            // shell.exec returns { code: , output: }
+            compileSuccess = shell.exec('node ' + tscPath + compileCmd).code;
+            console.log("success " + JSON.stringify(compileSuccess) + " " + compileCmd);
+
+            // Read output files
+            files.forEach(function (file) {
+                
+            });
+
+            // Remove the resulting files
+            rmdir(path.join(__dirname, compiledir), function (err) {
+                if (err) {
+                    throw err;
+                }
+
+                // Return buffers
+                that.emit('data', null);
+                that.emit('end');
+            });
+        });
     };
 
 
+    // bufferFiles is executed once per each file, compileFiles is called once at the end
     return through(bufferFiles, compileFiles);
 };
 

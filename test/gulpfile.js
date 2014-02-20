@@ -6,9 +6,10 @@ var gutil = require('gulp-util');
 var ts = require('../index');
 
 gulp.task('default', function(){
-      gulp.src('hello.ts')
+      gulp.src('hello2.ts')
         .pipe(ts({
-            module: 'commonjs',
-            removeComments: true
+            module: 'amd',
+            removeComments: true,
+            out: 'testout.js'
         }));
 });

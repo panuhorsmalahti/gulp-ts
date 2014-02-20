@@ -3,6 +3,8 @@ gulp-ts
 
 TypeScript compiler plugin for Gulp.
 
+Note: This is in heavy development.
+
 First install gulp-ts
 ```shell
 npm install --save-dev gulp-ts
@@ -43,11 +45,9 @@ Supports the following options.
   // Specify ECMAScript target version: 'ES3' (default), or 'ES5'
   target : 'ES3',
 
+  // Not supported yet!
   // Concatenate and emit output to single file.
   out : '', // output file name
-
-  // Redirect output structure to the directory.
-  outDir : '',
 
   // Specifies the location where debugger should locate TypeScript files instead of source locations.
   sourceRoot : '',
