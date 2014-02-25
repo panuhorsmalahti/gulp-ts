@@ -3,3 +3,4 @@ test/node_modules
 test/hello.js
 test/subfolder/hello2.js
 compiledir/
+test/out

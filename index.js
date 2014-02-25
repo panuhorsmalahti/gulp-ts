@@ -12,11 +12,8 @@ var gutil = require('gulp-util');
 var PluginError = gutil.PluginError;
 var File = gutil.File;
 
-var map = require('map-stream');
 var through = require('through');
 var shell = require('shelljs');
-
-var es = require('event-stream');
 
 // rm -rf for Node.js
 var rmdir = require('rimraf');
