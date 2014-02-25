@@ -13,6 +13,7 @@ npm install --save-dev gulp-ts
 
 Usage:
 ```javascript
+var gulp = requre('gulp');
 var ts = require('gulp-ts');
 
 // ...
@@ -20,7 +21,7 @@ gulp.task('typescript', function() {
   gulp.src('source.ts')
     .pipe(ts())
     .pipe(gulp.dest('out'));
-}
+});
 ```
 Supports the following options.
 ```javascript
