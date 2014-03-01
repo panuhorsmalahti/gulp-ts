@@ -28,7 +28,7 @@
     "through": "~2.3.4",
     "shelljs": "~0.2.6",
     "gulp-util": "~2.2.14",
-    "rimraf": "~2.2.6",
+    "rimraf": "~2.2.6"
   },
   "analyze": true,
   "devDependencies": {},
