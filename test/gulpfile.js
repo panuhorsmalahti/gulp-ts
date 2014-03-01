@@ -13,3 +13,13 @@ gulp.task('default', function(){
         }))
         .pipe(gulp.dest('out'));;
 });
+
+gulp.task('singlefile', function(){
+      gulp.src(['subfolder/hello4.ts', 'subfolder/hello3.ts', 'hello.ts', 'subfolder/hello2.ts'])
+        .pipe(ts({
+            module: 'commonjs',
+            removeComments: false,
+            out: 'singlefile.js'
+        }))
+        .pipe(gulp.dest('out'));;
+});

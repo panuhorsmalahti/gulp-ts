@@ -47,7 +47,6 @@ Supports the following options.
   // Specify ECMAScript target version: 'ES3' (default), or 'ES5'
   target : 'ES3',
 
-  // Not supported yet!
   // Concatenate and emit output to single file.
   out : '', // output file name
 

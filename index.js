@@ -63,11 +63,6 @@ var tsPlugin = function(options) {
             // The number of files read and pushed as File objects
             filesRead = 0;
 
-        // Add source file full paths to the compile command
-        files.forEach(function (file) {
-            compileCmd += ' ' + file.path;
-        });
-
         // Basic options
         if (options.sourceMap) {
             compileCmd += ' --sourcemap';
@@ -91,17 +86,16 @@ var tsPlugin = function(options) {
         // Target ES3/ES5
         compileCmd += ' --target ' + (options.target || 'ES3').toUpperCase();
 
-        // Not supported yet.
         // Output file
-        /* if (options.out) {
-            compileCmd += ' --out ' + options.out;
-        } */
-
-        // Compile all files to output directory. After compilation they're read to
-        // memory and the directory is destroyed. The reason for this 'hack' is that the
-        // TypeScript compiler doesn't easily support in-memory compilation.
-        // The use of --outDir for other means doesn't seem necessary.
-        compileCmd += ' --outDir ' + path.join(__dirname, compiledir);
+        if (options.out) {
+            compileCmd += ' --out ' + path.join(__dirname, compiledir, options.out);
+        } else {
+            // Compile all files to output directory. After compilation they're read to
+            // memory and the directory is destroyed. The reason for this 'hack' is that the
+            // TypeScript compiler doesn't easily support in-memory compilation.
+            // The use of --outDir for other means doesn't seem necessary.
+            compileCmd += ' --outDir ' + path.join(__dirname, compiledir);
+        }
 
         // Source root
         if (options.sourceRoot) {
@@ -112,6 +106,12 @@ var tsPlugin = function(options) {
         if (options.mapRoot) {
             compileCmd += ' --mapRoot' + options.mapRoot;
         }
+
+
+        // Add source file full paths to the compile command
+        files.forEach(function (file) {
+            compileCmd += ' ' + file.path;
+        });
 
         // Remove compiledir if it already exists
         rmdir(path.join(__dirname, compiledir), function (err) {
@@ -131,10 +131,9 @@ var tsPlugin = function(options) {
                         'Error during compilation!\n\n' + output));
                 }
 
-                // Read output files
-                files.forEach(function (file) {
+                var readSourceFile = function (relativePath, cwd, base) {
                     // Read from compiledir and replace .ts -> .js
-                    fs.readFile(path.join(__dirname, compiledir, file.relativePath.replace(".ts", ".js")), function (err, data) {
+                    fs.readFile(path.join(__dirname, compiledir, relativePath.replace(".ts", ".js")), function (err, data) {
                         // Read failed
                         if (err) {
                             throw err;
@@ -142,9 +141,9 @@ var tsPlugin = function(options) {
 
                         // Bug: Gulp flattens the output directory
                         that.push(new File({
-                            cwd: file.cwd,
-                            base: file.base,
-                            path: path.join(file.cwd, file.relativePath.replace(".ts", ".js")),
+                            cwd: cwd,
+                            base: base,
+                            path: path.join(cwd, relativePath.replace(".ts", ".js")),
                             contents: data
                         }));
 
@@ -153,7 +152,7 @@ var tsPlugin = function(options) {
 
                         // Last file has been read, and the directory can be cleaned out
                         // This assumes that the task is used with at least one file
-                        if (filesRead === files.length) {
+                        if (options.out || filesRead === files.length) {
                             rmdir(path.join(__dirname, compiledir), function (err) {
                                 if (err) {
                                     throw err;
@@ -162,9 +161,19 @@ var tsPlugin = function(options) {
                                 // Return buffers
                                 that.emit('end');
                             });
+                            that.emit('end');
                         }
                     });
-                });
+                };
+
+                // Read output files
+                if (options.out) {
+                    readSourceFile(options.out, '/', '/');
+                } else {
+                    files.forEach(function (file) {
+                        readSourceFile(file.relativePath, file.cwd, file.base);
+                    });
+                }
             });
         });
     };
