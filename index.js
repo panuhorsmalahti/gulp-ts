@@ -133,17 +133,17 @@ var tsPlugin = function(options) {
 
                 var readSourceFile = function (relativePath, cwd, base) {
                     // Read from compiledir and replace .ts -> .js
-                    fs.readFile(path.join(__dirname, compiledir, relativePath.replace(".ts", ".js")), function (err, data) {
+                    var sourceFileToRead = path.join(__dirname, compiledir, relativePath.replace(".ts", ".js"));
+                    fs.readFile(sourceFileToRead, function (err, data) {
                         // Read failed
                         if (err) {
                             throw err;
                         }
 
-                        // Bug: Gulp flattens the output directory
                         that.push(new File({
                             cwd: cwd,
                             base: base,
-                            path: path.join(cwd, relativePath.replace(".ts", ".js")),
+                            path: path.join(base, relativePath.replace(".ts", ".js")),
                             contents: data
                         }));
 
@@ -157,7 +157,6 @@ var tsPlugin = function(options) {
                                 if (err) {
                                     throw err;
                                 }
-
                                 // Return buffers
                                 that.emit('end');
                             });
@@ -171,7 +170,9 @@ var tsPlugin = function(options) {
                     readSourceFile(options.out, '/', '/');
                 } else {
                     files.forEach(function (file) {
-                        readSourceFile(file.relativePath, file.cwd, file.base);
+                        //NOTE: tsc flattens the directory structure in the output, so we only want the filename:
+                        relativePath = path.basename(file.relativePath);
+                        readSourceFile(relativePath, file.cwd, file.base);
                     });
                 }
             });
