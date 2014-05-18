@@ -15,6 +15,7 @@ gulp.task('default', function(){
 });
 
 gulp.task('glob-single-folder', function(){
+      //NOTE: this pattern will cause tsc to /not/ preserve the directory structure in the output as it contains only a single folder.
       gulp.src(['subfolder/*.ts'])
         .pipe(ts({
             module: 'commonjs',
@@ -24,6 +25,7 @@ gulp.task('glob-single-folder', function(){
 });
 
 gulp.task('glob-multiple-folders', function(){
+      //NOTE: this pattern will cause tsc to preserve the directory structure in the output as it contains multiple folders.
       gulp.src(['./**/*.ts'])
         .pipe(ts({
             module: 'commonjs',
