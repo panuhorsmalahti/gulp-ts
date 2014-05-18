@@ -14,6 +14,24 @@ gulp.task('default', function(){
         .pipe(gulp.dest('out'));;
 });
 
+gulp.task('glob-single-folder', function(){
+      gulp.src(['subfolder/*.ts'])
+        .pipe(ts({
+            module: 'commonjs',
+            removeComments: true
+        }))
+        .pipe(gulp.dest('out'));;
+});
+
+gulp.task('glob-multiple-folders', function(){
+      gulp.src(['./**/*.ts'])
+        .pipe(ts({
+            module: 'commonjs',
+            removeComments: true
+        }))
+        .pipe(gulp.dest('out'));;
+});
+
 gulp.task('singlefile', function(){
       gulp.src(['subfolder/hello4.ts', 'subfolder/hello3.ts', 'hello.ts', 'subfolder/hello2.ts'])
         .pipe(ts({
