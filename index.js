@@ -121,7 +121,7 @@ var tsPlugin = function(options) {
             }
 
             // Compile
-            console.log("Compiling..");
+            console.log("TypeScript compiling...");
 
             // shell.exec returns { code: , output: }
             // silent is set to true to prevent console output
@@ -157,10 +157,10 @@ var tsPlugin = function(options) {
                                 if (err) {
                                     throw err;
                                 }
+                                console.log("TypeScript compiling complete.");
                                 // Return buffers
                                 that.emit('end');
                             });
-                            that.emit('end');
                         }
                     });
                 };
