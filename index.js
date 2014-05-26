@@ -24,7 +24,9 @@ var rmdir = require('rimraf');
 var tsPlugin = function(options) {
     var bufferFiles,
         compileFiles,
-        files = [];
+        files = [],
+        // Files are compiled in this sub-directory
+        compiledir = 'compiledir';
 
     // Default options
     if (!options) {
@@ -54,8 +56,6 @@ var tsPlugin = function(options) {
     compileFiles = function() {
             // Construct a compile command to be used with the shell TypeScript compiler
         var compileCmd = '',
-            // Files are compiled in this sub-directory
-            compiledir = 'compiledir',
             // Path to the TypeScript binary
             tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
             // ES6 plz
@@ -111,7 +111,7 @@ var tsPlugin = function(options) {
         // Add source file full paths to the compile command
         files.forEach(function (file) {
             compileCmd += ' ' + file.path;
-        });
+            });
 
         // Remove compiledir if it already exists
         rmdir(path.join(__dirname, compiledir), function (err) {
@@ -174,6 +174,8 @@ var tsPlugin = function(options) {
                 };
 
                 // Read output files
+                handleDeclaration.apply(that);
+
                 if (options.out) {
                     readSourceFile(options.out, '/', '/');
                 } else {
@@ -185,8 +187,38 @@ var tsPlugin = function(options) {
         });
     };
 
+    /* Handles buffering the declaration file if necessary */
+    handleDeclaration = function () {
+        that = this;
+        if (!options.declaration)
+            return;
+        // The declaration is the same as the out file specified with --out or it seems it is the name of the root source file
+        var srcPath; // relative path to file generated from tsc
+        var cwd = process.cwd();
+        
+        if (options.out) {
+            srcPath = options.out.replace('.js', '.d.ts');
+        } else {
+            srcPath = files[0].path.replace('.ts', '.d.ts');
+        }
+        srcPath = path.relative(cwd, srcPath);
+        // read in the generated file:
+        var data = fs.readFileSync(path.join(__dirname, compiledir, srcPath));
+        // buffer it:
+        var fileConfig = {
+            base: path.dirname(srcPath),
+            path: srcPath,
+            contents: data
+        };
+        console.log('fileConfig:', fileConfig);
+        that.push(new File(fileConfig));
+    }
+
+
+
     // bufferFiles is executed once per each file, compileFiles is called once at the end
     return through(bufferFiles, compileFiles);
 };
 
 module.exports = tsPlugin;
+

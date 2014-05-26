@@ -1,9 +1,15 @@
 // Simple Gulpfile
 var gulp = require('gulp');
 var gutil = require('gulp-util');
+var shell = require('shelljs');
 
 // Gulp plugins
 var ts = require('../index');
+var mocha = require('gulp-mocha');
+
+gulp.task('clean', function() {
+    shell.rm('-rf', 'out');
+});
 
 gulp.task('default', function(){
       gulp.src(['hello.ts', 'subfolder/hello3.ts'])
@@ -25,7 +31,7 @@ gulp.task('singlefile', function(){
 });
 
 gulp.task('debug', function(){
-      gulp.src(['hello.ts', 'subfolder/hello3.ts'])
+    gulp.src(['hello.ts', 'subfolder/hello3.ts'])
         .pipe(ts({
             module: 'commonjs',
             removeComments: true,
@@ -33,4 +39,36 @@ gulp.task('debug', function(){
             debug: true,
         }))
         .pipe(gulp.dest('out'));;
+});
+
+gulp.task('declaration', ['clean'], function(){
+    return gulp.src(['log.ts'])
+        .pipe(ts({
+            module: 'commonjs',
+            removeComments: true,
+            verbose: true,
+            debug: true,
+            declaration: true
+        }))
+        .pipe(gulp.dest('out'));
+});
+
+gulp.task('declaration-singlefile', ['clean'], function(){
+      return gulp.src(['log.ts', 'subfolder/hello4.ts'])
+        .pipe(ts({
+            module: 'commonjs',
+            removeComments: true,
+            verbose: true,
+            debug: true,
+            declaration: true,
+            out: 'myindex.js'
+        }))
+        .pipe(gulp.dest('out'));
+});
+
+gulp.task('test', function() {
+    return gulp.src('test.js')
+        .pipe(
+            mocha({ reporter: 'nyan' })
+        );
 });
