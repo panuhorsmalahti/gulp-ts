@@ -9,6 +9,7 @@ var path = require('path');
 
 // Gulp
 var gutil = require('gulp-util');
+var log = gutil.log;
 var PluginError = gutil.PluginError;
 var File = gutil.File;
 
@@ -26,13 +27,15 @@ var tsPlugin = function(options) {
         compileFiles,
         files = [],
         // Files are compiled in this sub-directory
-        compiledir = 'compiledir';
+        compiledir = 'compiledir',
+        thisdir = __dirname;
 
     // Default options
     if (!options) {
         options = {};
     }
-
+    if (options.debug)
+        options.verbose = true;
 
     // Collect all files to an array
     bufferFiles = function(file) {
@@ -88,13 +91,13 @@ var tsPlugin = function(options) {
 
         // Output file
         if (options.out) {
-            compileCmd += ' --out ' + path.join(__dirname, compiledir, options.out);
+            compileCmd += ' --out ' + path.join(thisdir, compiledir, options.out);
         } else {
             // Compile all files to output directory. After compilation they're read to
             // memory and the directory is destroyed. The reason for this 'hack' is that the
             // TypeScript compiler doesn't easily support in-memory compilation.
             // The use of --outDir for other means doesn't seem necessary.
-            compileCmd += ' --outDir ' + path.join(__dirname, compiledir);
+            compileCmd += ' --outDir ' + path.join(thisdir, compiledir);
         }
 
         // Source root
@@ -114,21 +117,24 @@ var tsPlugin = function(options) {
             });
 
         // Remove compiledir if it already exists
-        rmdir(path.join(__dirname, compiledir), function (err) {
+        rmdir(path.join(thisdir, compiledir), function (err) {
             // Remove failed
             if (err) {
                 throw err;
             }
 
             // Compile
-            console.log("Compiling..");
+            log('Compiling...');
             if (options.verbose) {
-                console.log(' compile cmd:', compileCmd)
+                log(' compile cmd:', compileCmd)
             }
 
             // shell.exec returns { code: , output: }
             // silent is set to true to prevent console output
             shell.exec('node ' + tscPath + compileCmd, { silent: true }, function (code, output) {
+                if (options.debug) {
+                    log(' tsc output: [', output, ']')
+                }
                 if (code) {
                     return that.emit('error', new PluginError('gulp-ts',
                         'Error during compilation!\n\n' + output));
@@ -136,7 +142,9 @@ var tsPlugin = function(options) {
 
                 var readSourceFile = function (relativePath, cwd, base) {
                     // Read from compiledir and replace .ts -> .js
-                    fs.readFile(path.join(__dirname, compiledir, relativePath.replace(".ts", ".js")), function (err, data) {
+                    var theFile = path.join(thisdir, compiledir, relativePath.replace('.ts', '.js'));
+                    log(theFile + ' exists:', fs.existsSync(theFile));
+                    fs.readFile(path.join(thisdir, compiledir, relativePath.replace('.ts', '.js')), function (err, data) {
                         // Read failed
                         if (err) {
                             throw err;
@@ -146,7 +154,7 @@ var tsPlugin = function(options) {
                         that.push(new File({
                             cwd: cwd,
                             base: base,
-                            path: path.join(cwd, relativePath.replace(".ts", ".js")),
+                            path: path.join(cwd, relativePath.replace('.ts', '.js')),
                             contents: data
                         }));
 
@@ -157,16 +165,16 @@ var tsPlugin = function(options) {
                         // This assumes that the task is used with at least one file
                         if (options.out || filesRead === files.length) {
                             if (!options.debug) {
-                                rmdir(path.join(__dirname, compiledir), function (err) {
+                                rmdir(path.join(thisdir, compiledir), function (err) {
                                     if (err) {
                                         throw err;
                                     }
                                     // Return buffers
                                     that.emit('end');
-                                    console.log("Compiling complete.");
+                                    log('Compiling complete.');
                                 });
                             } else {
-                                console.log('In debug mode, so compiledir was left for inspection.')
+                                log('In debug mode, so compiledir was left for inspection.')
                                 that.emit('end');
                             }
                         }
@@ -203,7 +211,7 @@ var tsPlugin = function(options) {
         }
         srcPath = path.relative(cwd, srcPath);
         // read in the generated file:
-        var data = fs.readFileSync(path.join(__dirname, compiledir, srcPath));
+        var data = fs.readFileSync(path.join(thisdir, compiledir, srcPath));
         // buffer it:
         var fileConfig = {
             base: path.dirname(srcPath),

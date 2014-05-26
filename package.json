@@ -15,6 +15,9 @@
     "type": "git",
     "url": "https://github.com/panuhorsmalahti/gulp-ts.git"
   },
+  "scripts": {
+    "test": "gulp --gulpfile ./test/gulpfile.js test"
+  },
   "keywords": [
     "gulp",
     "typescript",

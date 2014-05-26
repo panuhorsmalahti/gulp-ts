@@ -66,6 +66,15 @@ gulp.task('declaration-singlefile', ['clean'], function(){
         .pipe(gulp.dest('out'));
 });
 
+gulp.task('subfolder-only', function(){
+      gulp.src(['subfolder/hello3.ts'])
+        .pipe(ts({
+            module: 'commonjs',
+            removeComments: true
+        }))
+        .pipe(gulp.dest('out'));;
+});
+
 gulp.task('test', function() {
     return gulp.src('test.js')
         .pipe(
