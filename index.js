@@ -210,7 +210,6 @@ var tsPlugin = function(options) {
             path: srcPath,
             contents: data
         };
-        console.log('fileConfig:', fileConfig);
         that.push(new File(fileConfig));
     }
 
