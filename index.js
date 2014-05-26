@@ -122,6 +122,9 @@ var tsPlugin = function(options) {
 
             // Compile
             console.log("Compiling..");
+            if (options.verbose) {
+                console.log(' compile cmd:', compileCmd)
+            }
 
             // shell.exec returns { code: , output: }
             // silent is set to true to prevent console output
@@ -153,15 +156,19 @@ var tsPlugin = function(options) {
                         // Last file has been read, and the directory can be cleaned out
                         // This assumes that the task is used with at least one file
                         if (options.out || filesRead === files.length) {
-                            rmdir(path.join(__dirname, compiledir), function (err) {
-                                if (err) {
-                                    throw err;
-                                }
-
-                                // Return buffers
+                            if (!options.debug) {
+                                rmdir(path.join(__dirname, compiledir), function (err) {
+                                    if (err) {
+                                        throw err;
+                                    }
+                                    // Return buffers
+                                    that.emit('end');
+                                    console.log("Compiling complete.");
+                                });
+                            } else {
+                                console.log('In debug mode, so compiledir was left for inspection.')
                                 that.emit('end');
-                            });
-                            that.emit('end');
+                            }
                         }
                     });
                 };

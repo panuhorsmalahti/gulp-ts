@@ -23,3 +23,14 @@ gulp.task('singlefile', function(){
         }))
         .pipe(gulp.dest('out'));;
 });
+
+gulp.task('debug', function(){
+      gulp.src(['hello.ts', 'subfolder/hello3.ts'])
+        .pipe(ts({
+            module: 'commonjs',
+            removeComments: true,
+            verbose: true,
+            debug: true,
+        }))
+        .pipe(gulp.dest('out'));;
+});
