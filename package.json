@@ -16,7 +16,7 @@
     "url": "https://github.com/panuhorsmalahti/gulp-ts.git"
   },
   "scripts": {
-    "test": "gulp --gulpfile ./test/gulpfile.js test"
+    "test": "jslint index.js && gulp --gulpfile ./test/gulpfile.js test"
   },
   "keywords": [
     "gulp",
@@ -34,7 +34,9 @@
     "rimraf": "~2.2.6"
   },
   "analyze": true,
-  "devDependencies": {},
+  "devDependencies": {
+    "jslint": "^0.5.2"
+  },
   "license": "MIT",
   "engines": {
     "node": ">=0.10"
