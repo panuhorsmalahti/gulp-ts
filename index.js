@@ -142,8 +142,6 @@ var tsPlugin = function(options) {
 
                 var readSourceFile = function (relativePath, cwd, base) {
                     // Read from compiledir and replace .ts -> .js
-                    var theFile = path.join(thisdir, compiledir, relativePath.replace('.ts', '.js'));
-                    log(theFile + ' exists:', fs.existsSync(theFile));
                     fs.readFile(path.join(thisdir, compiledir, relativePath.replace('.ts', '.js')), function (err, data) {
                         // Read failed
                         if (err) {
