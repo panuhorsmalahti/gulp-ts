@@ -10,15 +10,17 @@ var fs = require('fs');
 var path = require('path');
 
 describe('gulp-ts', function () {
-	var seconds=1000;
-	this.timeout(5*seconds);
+	var seconds=5;
+	this.timeout(seconds*1000);
 
 	gulp = function(task, done) {
 		exec('gulp ' + task, function(error, stdout, stderr) {
-			if (stderr)
+			if (stderr) {
 				console.log('gulp.stderr:' + stderr);
-			if (error)
+			}
+			if (error) {
 				throw error;
+			}
 			done();
 		});
 	};

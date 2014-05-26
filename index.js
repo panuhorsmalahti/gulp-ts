@@ -25,6 +25,7 @@ var rmdir = require('rimraf');
 var tsPlugin = function(options) {
     var bufferFiles,
         compileFiles,
+        handleDeclaration,
         files = [],
         // Files are compiled in this sub-directory
         compiledir = 'compiledir',
@@ -193,11 +194,12 @@ var tsPlugin = function(options) {
         });
     };
 
-    /* Handles buffering the declaration file if necessary */
+    // Handles buffering the declaration file if necessary
     handleDeclaration = function () {
-        that = this;
-        if (!options.declaration)
+        var that = this;
+        if (!options.declaration) {
             return;
+        }
         // The declaration is the same as the out file specified with --out or it seems it is the name of the root source file
         var srcPath; // relative path to file generated from tsc
         var cwd = process.cwd();
@@ -218,9 +220,6 @@ var tsPlugin = function(options) {
         };
         that.push(new File(fileConfig));
     }
-
-
-
     // bufferFiles is executed once per each file, compileFiles is called once at the end
     return through(bufferFiles, compileFiles);
 };
