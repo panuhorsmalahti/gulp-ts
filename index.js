@@ -26,8 +26,7 @@ var tsPlugin = function (options) {
         handleDeclaration,
         files = [],
         // Files are compiled in this sub-directory
-        compiledir = 'compiledir',
-        thisdir = __dirname;
+        compiledir = 'compiledir';
 
     // Default options
     if (!options) {
@@ -92,13 +91,13 @@ var tsPlugin = function (options) {
 
         // Output file
         if (options.out) {
-            compileCmd += ' --out ' + path.join(thisdir, compiledir, options.out);
+            compileCmd += ' --out ' + path.join(__dirname, compiledir, options.out);
         } else {
             // Compile all files to output directory. After compilation they're read to
             // memory and the directory is destroyed. The reason for this 'hack' is that the
             // TypeScript compiler doesn't easily support in-memory compilation.
             // The use of --outDir for other means doesn't seem necessary.
-            compileCmd += ' --outDir ' + path.join(thisdir, compiledir);
+            compileCmd += ' --outDir ' + path.join(__dirname, compiledir);
         }
 
         // Source root
@@ -118,7 +117,7 @@ var tsPlugin = function (options) {
         });
 
         // Remove compiledir if it already exists
-        rmdir(path.join(thisdir, compiledir), function (err) {
+        rmdir(path.join(__dirname, compiledir), function (err) {
             // Remove failed
             if (err) {
                 throw err;
@@ -143,7 +142,7 @@ var tsPlugin = function (options) {
 
                 var readSourceFile = function (relativePath, cwd, base) {
                     // Read from compiledir and replace .ts -> .js
-                    fs.readFile(path.join(thisdir, compiledir, relativePath.replace('.ts', '.js')), function (err, data) {
+                    fs.readFile(path.join(__dirname, compiledir, relativePath.replace('.ts', '.js')), function (err, data) {
                         // Read failed
                         if (err) {
                             throw err;
@@ -164,7 +163,7 @@ var tsPlugin = function (options) {
                         // This assumes that the task is used with at least one file
                         if (options.out || filesRead === files.length) {
                             if (!options.debug) {
-                                rmdir(path.join(thisdir, compiledir), function (err) {
+                                rmdir(path.join(__dirname, compiledir), function (err) {
                                     if (err) {
                                         throw err;
                                     }
@@ -215,7 +214,7 @@ var tsPlugin = function (options) {
         srcPath = path.relative(cwd, srcPath);
         /*jslint node: true, stupid: true */
         // read in the generated file:
-        data = fs.readFileSync(path.join(thisdir, compiledir, srcPath));
+        data = fs.readFileSync(path.join(__dirname, compiledir, srcPath));
         /*jslint node: true, stupid: false */
         // buffer it:
         fileConfig = {
