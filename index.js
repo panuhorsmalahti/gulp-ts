@@ -198,7 +198,6 @@ var tsPlugin = function (options) {
         var that = this,
             srcPath, // relative path to file generated from tsc
             cwd = process.cwd(),
-            data,
             fileConfig;
 
         if (!options.declaration) {
@@ -212,17 +211,19 @@ var tsPlugin = function (options) {
             srcPath = files[0].path.replace('.ts', '.d.ts');
         }
         srcPath = path.relative(cwd, srcPath);
-        /*jslint node: true, stupid: true */
         // read in the generated file:
-        data = fs.readFileSync(path.join(__dirname, compiledir, srcPath));
-        /*jslint node: true, stupid: false */
-        // buffer it:
-        fileConfig = {
-            base: path.dirname(srcPath),
-            path: srcPath,
-            contents: data
-        };
-        that.push(new File(fileConfig));
+        fs.readFile(path.join(__dirname, compiledir, srcPath), function (err, data) {
+            if (err) {
+                throw err;
+            }
+            // buffer it:
+            fileConfig = {
+                base: path.dirname(srcPath),
+                path: srcPath,
+                contents: data
+            };
+            that.push(new File(fileConfig));
+        });
     };
     // bufferFiles is executed once per each file, compileFiles is called once at the end
     return through(bufferFiles, compileFiles);
