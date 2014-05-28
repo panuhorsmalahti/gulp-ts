@@ -8,9 +8,10 @@ var exec = require('child_process').exec;
 var should = require('should');
 var fs = require('fs');
 var path = require('path');
+var shell = require('shelljs');
 
 describe('gulp-ts', function () {
-	var seconds=5;
+	var seconds=8;
 	this.timeout(seconds*1000);
 
 	gulp = function(task, done) {
@@ -25,30 +26,52 @@ describe('gulp-ts', function () {
 		});
 	};
 
+	filesShouldExist = function(expectedFiles, done) {
+		expectedFiles.forEach(function (theFile) {
+			var doesExist = fs.existsSync(path.join('out', theFile));
+			//console.log(theFile, doesExist ? 'does exist' : 'does NOT exist');
+			doesExist.should.be.true;
+		});
+		if (done) {
+			done();
+		}
+	}
+
+	it ('should compile files in multiple folders', function(done) {
+		//['hello.ts', 'subfolder/hello3.ts']
+		gulp('default', function() {
+			var expectedFiles = [
+				'hello.js',
+				'hello3.js'
+			];
+			filesShouldExist(expectedFiles, done);
+		});
+	})
+
 	it ('should export declaration', function(done) {
 		gulp('declaration', function() {
-			fs.exists(path.join('out', 'log.d.ts'), function (fileExists) {
-				fileExists.should.be.true;
-				done();
-			});
+			var expectedFiles = [
+				'log.d.ts'
+			];
+			filesShouldExist(expectedFiles, done);
 		});
 	});
 
 	it ('should export declaration with singlefile', function(done) {
 		gulp('declaration-singlefile', function() {
-			fs.exists(path.join('out', 'myindex.d.ts'), function (fileExists) {
-				fileExists.should.be.true;
-				done();
-			});
+			var expectedFiles = [
+				'myindex.d.ts'
+			];
+			filesShouldExist(expectedFiles, done);
 		});
 	})
 //this is failing but no easy solution
 	it.skip ('should work with a file in subfolder only', function (done) {
 		gulp('subfolder-only', function() {
-			fs.exists(path.join('out', 'hello3.js'), function (fileExists) {
-				fileExists.should.be.true;
-				done();
-			});
+			expectedFiles =	[
+				'hello3.js'
+			];
+			filesShouldExist(expectedFiles, done);
 		});
 	});
 });

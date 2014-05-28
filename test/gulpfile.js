@@ -11,7 +11,7 @@ gulp.task('clean', function() {
     shell.rm('-rf', 'out');
 });
 
-gulp.task('default', function(){
+gulp.task('default', ['clean'], function(){
       gulp.src(['hello.ts', 'subfolder/hello3.ts'])
         .pipe(ts({
             module: 'commonjs',
@@ -20,7 +20,7 @@ gulp.task('default', function(){
         .pipe(gulp.dest('out'));;
 });
 
-gulp.task('singlefile', function(){
+gulp.task('singlefile', ['clean'], function(){
       gulp.src(['subfolder/hello4.ts', 'subfolder/hello3.ts', 'hello.ts', 'subfolder/hello2.ts'])
         .pipe(ts({
             module: 'commonjs',
@@ -30,7 +30,7 @@ gulp.task('singlefile', function(){
         .pipe(gulp.dest('out'));;
 });
 
-gulp.task('debug', function(){
+gulp.task('debug', ['clean'], function(){
     gulp.src(['hello.ts', 'subfolder/hello3.ts'])
         .pipe(ts({
             module: 'commonjs',
@@ -66,11 +66,10 @@ gulp.task('declaration-singlefile', ['clean'], function(){
         .pipe(gulp.dest('out'));
 });
 
-gulp.task('subfolder-only', function(){
+gulp.task('subfolder-only', ['clean'], function(){
       gulp.src(['subfolder/hello3.ts'])
         .pipe(ts({
-            module: 'commonjs',
-            removeComments: true
+            module: 'commonjs'
         }))
         .pipe(gulp.dest('out'));;
 });
