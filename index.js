@@ -180,21 +180,21 @@ var tsPlugin = function (options) {
                 };
 
                 // Read output files
-                handleDeclaration.apply(that);
-
-                if (options.out) {
-                    readSourceFile(options.out, '/', '/');
-                } else {
-                    files.forEach(function (file) {
-                        readSourceFile(file.relativePath, file.cwd, file.base);
-                    });
-                }
+                handleDeclaration.call(that, function () {
+                    if (options.out) {
+                        readSourceFile(options.out, '/', '/');
+                    } else {
+                        files.forEach(function (file) {
+                            readSourceFile(file.relativePath, file.cwd, file.base);
+                        });
+                    }
+                });
             });
         });
     };
 
     // Handles buffering the declaration file if necessary.
-    handleDeclaration = function () {
+    handleDeclaration = function (done) {
         var that = this,
             srcPath, // relative path to file generated from tsc
             cwd = process.cwd(),
@@ -223,6 +223,7 @@ var tsPlugin = function (options) {
                 contents: data
             };
             that.push(new File(fileConfig));
+            done();
         });
     };
     // bufferFiles is executed once per each file, compileFiles is called once at the end
