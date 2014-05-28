@@ -1,13 +1,14 @@
 /*jshint node:true */
 
 // Requires
+var fs = require('fs');
+var path = require('path');
+
 var gutil = require('gulp-util');
 var ts = require('../index');
 var assert = require('assert');
 var exec = require('child_process').exec;
 var should = require('should');
-var fs = require('fs');
-var path = require('path');
 var shell = require('shelljs');
 
 describe('gulp-ts', function () {
@@ -65,7 +66,7 @@ describe('gulp-ts', function () {
 			filesShouldExist(expectedFiles, done);
 		});
 	})
-//this is failing but no easy solution
+	// This is failing but no easy solution
 	it.skip ('should work with a file in subfolder only', function (done) {
 		gulp('subfolder-only', function() {
 			expectedFiles =	[
