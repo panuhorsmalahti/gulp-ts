@@ -1,6 +1,8 @@
-node_modules
-test/node_modules
-test/hello.js
-test/subfolder/hello2.js
-compiledir/
-test/out
+/node_modules
+/test/node_modules
+/test/hello.js
+/test/subfolder/hello2.js
+/test/log.d.ts
+/test/log.js
+/compiledir/
+/test/out

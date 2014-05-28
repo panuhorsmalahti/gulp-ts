@@ -1,3 +1,4 @@
+"use strict";
 /*jslint node:true */
 /*jslint nomen: true */
 
@@ -9,6 +10,7 @@ var path = require('path');
 
 // Gulp
 var gutil = require('gulp-util');
+var log = gutil.log;
 var PluginError = gutil.PluginError;
 var File = gutil.File;
 
@@ -18,44 +20,45 @@ var shell = require('shelljs');
 // rm -rf for Node.js
 var rmdir = require('rimraf');
 
-"use strict";
-
-
-var tsPlugin = function(options) {
+var tsPlugin = function (options) {
     var bufferFiles,
         compileFiles,
-        files = [];
+        handleDeclaration,
+        files = [],
+        // Files are compiled in this sub-directory
+        compiledir = 'compiledir';
 
     // Default options
     if (!options) {
         options = {};
     }
-
+    if (options.debug) {
+        options.verbose = true;
+    }
 
     // Collect all files to an array
-    bufferFiles = function(file) {
+    bufferFiles = function (file) {
         // Null values and streams are skipped
         if (file.isNull()) {
             return;
-        } else if (file.isStream()) {
+        }
+        if (file.isStream()) {
             return this.emit('error', new PluginError('gulp-ts',  'Streaming not supported'));
         }
 
         // Using path.relative doesn't seem safe, but we need the relative path
         // to the 'base', e.g. if we have 'a.ts' and 'b/b.ts' from src, the relative
         // property tells the path from cwd to path.
-        file.relativePath = path.relative(file.cwd, file.path)
+        file.relativePath = path.relative(file.cwd, file.path);
 
         // Add file to the list of source files
         files.push(file);
     };
 
     // Compile all files defined in the files Array
-    compileFiles = function() {
+    compileFiles = function () {
             // Construct a compile command to be used with the shell TypeScript compiler
         var compileCmd = '',
-            // Files are compiled in this sub-directory
-            compiledir = 'compiledir',
             // Path to the TypeScript binary
             tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
             // ES6 plz
@@ -121,14 +124,17 @@ var tsPlugin = function(options) {
             }
 
             // Compile
-            console.log("Compiling..");
+            log('Compiling...');
             if (options.verbose) {
-                console.log(' compile cmd:', compileCmd)
+                log(' compile cmd:', compileCmd);
             }
 
             // shell.exec returns { code: , output: }
             // silent is set to true to prevent console output
             shell.exec('node ' + tscPath + compileCmd, { silent: true }, function (code, output) {
+                if (options.debug) {
+                    log(' tsc output: [', output, ']');
+                }
                 if (code) {
                     return that.emit('error', new PluginError('gulp-ts',
                         'Error during compilation!\n\n' + output));
@@ -136,7 +142,7 @@ var tsPlugin = function(options) {
 
                 var readSourceFile = function (relativePath, cwd, base) {
                     // Read from compiledir and replace .ts -> .js
-                    fs.readFile(path.join(__dirname, compiledir, relativePath.replace(".ts", ".js")), function (err, data) {
+                    fs.readFile(path.join(__dirname, compiledir, relativePath.replace('.ts', '.js')), function (err, data) {
                         // Read failed
                         if (err) {
                             throw err;
@@ -146,12 +152,12 @@ var tsPlugin = function(options) {
                         that.push(new File({
                             cwd: cwd,
                             base: base,
-                            path: path.join(cwd, relativePath.replace(".ts", ".js")),
+                            path: path.join(cwd, relativePath.replace('.ts', '.js')),
                             contents: data
                         }));
 
                         // Increase counter
-                        filesRead++;
+                        filesRead += 1;
 
                         // Last file has been read, and the directory can be cleaned out
                         // This assumes that the task is used with at least one file
@@ -163,10 +169,10 @@ var tsPlugin = function(options) {
                                     }
                                     // Return buffers
                                     that.emit('end');
-                                    console.log("Compiling complete.");
+                                    log('Compiling complete.');
                                 });
                             } else {
-                                console.log('In debug mode, so compiledir was left for inspection.')
+                                log('In debug mode, so compiledir was left for inspection.');
                                 that.emit('end');
                             }
                         }
@@ -174,17 +180,51 @@ var tsPlugin = function(options) {
                 };
 
                 // Read output files
-                if (options.out) {
-                    readSourceFile(options.out, '/', '/');
-                } else {
-                    files.forEach(function (file) {
-                        readSourceFile(file.relativePath, file.cwd, file.base);
-                    });
-                }
+                handleDeclaration.call(that, function () {
+                    if (options.out) {
+                        readSourceFile(options.out, '/', '/');
+                    } else {
+                        files.forEach(function (file) {
+                            readSourceFile(file.relativePath, file.cwd, file.base);
+                        });
+                    }
+                });
             });
         });
     };
 
+    // Handles buffering the declaration file if necessary.
+    handleDeclaration = function (done) {
+        var that = this,
+            srcPath, // relative path to file generated from tsc
+            cwd = process.cwd(),
+            fileConfig;
+
+        if (options.declaration) {
+            // NOTE: The declaration file generated by tsc is the same as the out file specified with --out or it seems it is the name of the root source file
+            if (options.out) {
+                srcPath = options.out.replace('.js', '.d.ts');
+            } else {
+                srcPath = files[0].path.replace('.ts', '.d.ts');
+            }
+            srcPath = path.relative(cwd, srcPath);
+            // read in the generated file:
+            fs.readFile(path.join(__dirname, compiledir, srcPath), function (err, data) {
+                if (err) {
+                    throw err;
+                }
+                // buffer it:
+                fileConfig = {
+                    base: path.dirname(srcPath),
+                    path: srcPath,
+                    contents: data
+                };
+                that.push(new File(fileConfig));
+                done();
+            });
+        }
+        done();
+    };
     // bufferFiles is executed once per each file, compileFiles is called once at the end
     return through(bufferFiles, compileFiles);
 };

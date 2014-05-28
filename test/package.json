@@ -2,6 +2,9 @@
   "dependencies": {},
   "analyze": true,
   "devDependencies": {
+    "gulp-mocha": "^0.4.1",
+    "shelljs": "^0.3.0",
+    "should": "^3.3.2",
     "typescript": "~0.9.5"
   }
 }
