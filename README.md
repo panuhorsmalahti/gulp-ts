@@ -3,8 +3,6 @@ gulp-ts
 
 TypeScript compiler plugin for Gulp.
 
-Note: This is in heavy development.
-
 First install gulp-ts
 ```shell
 npm install --save-dev gulp-ts
