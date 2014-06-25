@@ -2,7 +2,9 @@
 /*jslint node:true */
 /*jslint nomen: true */
 
-// Requires
+/**
+ * Requires
+ */
 
 // Native
 var fs = require('fs');
@@ -62,10 +64,21 @@ var tsPlugin = function (options) {
             // Path to the TypeScript binary
             // TODO: We can't be certain about the location, find the path properly.
             tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
-
             that = this,
             // The number of files read and pushed as File objects
             filesRead = 0;
+
+        // If tsc doesn't exist in the local node_modules
+        if (!shell.test('-f', tscPath)) {
+            // Try to find tsc from the system PATH, returns falsy if not found
+            tscPath = shell.which('tsc');
+        }
+
+        // tsc not found, abort
+        if (!tscPath) {
+            return this.emit('error', new PluginError('gulp-ts',
+                'Error, TypeScript compiler not found from node_modules or system PATH!\n'));
+        }
 
         // Basic options
         if (options.sourceMap) {

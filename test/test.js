@@ -1,5 +1,7 @@
 /*jshint node:true */
 
+// Run with mocha test.js
+
 // Requires
 var fs = require('fs');
 var path = require('path');
