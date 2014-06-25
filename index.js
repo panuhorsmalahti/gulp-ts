@@ -62,6 +62,7 @@ var tsPlugin = function (options) {
             // Path to the TypeScript binary
             // TODO: We can't be certain about the location, find the path properly.
             tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
+
             that = this,
             // The number of files read and pushed as File objects
             filesRead = 0;
@@ -130,7 +131,7 @@ var tsPlugin = function (options) {
 
             // shell.exec returns { code: , output: }
             // silent is set to true to prevent console output
-            shell.exec('node ' + tscPath + compileCmd, { silent: true }, function (code, output) {
+            shell.exec(process.execPath + ' ' + tscPath + compileCmd, { silent: true }, function (code, output) {
                 if (options.debug) {
                     log(' tsc output: [', output, ']');
                 }
