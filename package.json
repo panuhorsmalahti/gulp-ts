@@ -1,7 +1,7 @@
 {
   "name": "gulp-ts",
   "preferGlobal": false,
-  "version": "0.0.14",
+  "version": "0.0.15",
   "author": "Panu Horsmalahti <panu.horsmalahti@iki.fi>",
   "description": "TypeScript compiler Gulp plugin",
   "contributors": [
