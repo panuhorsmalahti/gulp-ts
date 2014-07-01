@@ -1,6 +1,6 @@
-"use strict";
 /*jslint node:true */
 /*jslint nomen: true */
+"use strict";
 
 /**
  * Requires
@@ -59,7 +59,7 @@ var tsPlugin = function (options) {
 
     // Compile all files defined in the files Array
     compileFiles = function () {
-            // Construct a compile command to be used with the shell TypeScript compiler
+        // Construct a compile command to be used with the shell TypeScript compiler
         var compileCmd = '',
             // Path to the TypeScript binary
             // TODO: We can't be certain about the location, find the path properly.
