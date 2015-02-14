@@ -1,6 +1,6 @@
 /*jshint node:true */
 
-// Run with mocha test.js
+// Run with 'gulp test'
 
 // Requires
 var fs = require('fs');

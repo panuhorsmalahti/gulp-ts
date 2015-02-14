@@ -1,7 +1,7 @@
 gulp-ts
 =========
 
-TypeScript compiler plugin for Gulp.
+TypeScript compiler plugin for Gulp. Not actively maintained.
 
 First install gulp-ts
 ```shell
