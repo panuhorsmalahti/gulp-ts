@@ -82,7 +82,7 @@ var tsPlugin = function (options) {
 
         // Basic options
         if (options.sourceMap) {
-            compileCmd += ' --sourcemap';
+            compileCmd += ' --sourceMap';
         }
         if (options.declaration) {
             compileCmd += ' --declaration';
@@ -116,12 +116,12 @@ var tsPlugin = function (options) {
 
         // Source root option
         if (options.sourceRoot) {
-            compileCmd += ' --sourceRoot' + options.sourceRoot;
+            compileCmd += ' --sourceRoot ' + options.sourceRoot;
         }
 
         // Map root option
         if (options.mapRoot) {
-            compileCmd += ' --mapRoot' + options.mapRoot;
+            compileCmd += ' --mapRoot ' + options.mapRoot;
         }
 
         // Add source file full paths to the compile command
