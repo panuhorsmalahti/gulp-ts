@@ -1,7 +1,7 @@
 {
   "name": "gulp-ts",
   "preferGlobal": false,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Panu Horsmalahti <panu.horsmalahti@iki.fi>",
   "description": "TypeScript compiler Gulp plugin",
   "contributors": [
@@ -27,11 +27,11 @@
     "gulpfriendly"
   ],
   "dependencies": {
-    "typescript": "~1.4.1",
-    "through": "~2.3.4",
-    "shelljs": "~0.3.0",
-    "gulp-util": "~2.2.18",
-    "rimraf": "~2.2.8"
+    "typescript": "~1.6.2",
+    "through": "~2.3.8",
+    "shelljs": "~0.5.3",
+    "gulp-util": "~3.0.7",
+    "rimraf": "~2.4.4"
   },
   "analyze": true,
   "devDependencies": {
