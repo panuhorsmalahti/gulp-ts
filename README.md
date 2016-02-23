@@ -24,6 +24,12 @@ gulp.task('typescript', function() {
 Supports the following options.
 ```javascript
  .pipe(ts({
+  // explicit path to tsc executable file; taken if not falsy
+  exePath: '',
+
+  // forces usage of tsc executable file from system PATH
+  globalExe: false,
+
   // Generates corresponding .map file.
   sourceMap : false,
 
@@ -52,6 +58,6 @@ Supports the following options.
   sourceRoot : '',
 
   // Specifies the location where debugger should locate map files instead of generated locations.
-  mapRoot : '' 
+  mapRoot : ''
 }));
 ```

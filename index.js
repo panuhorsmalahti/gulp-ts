@@ -1,10 +1,10 @@
 /*jslint node:true */
 /*jslint nomen: true */
-"use strict";
+'use strict';
 
 /**
- * Requires
- */
+  * Requires
+  */
 
 // Native
 var fs = require('fs');
@@ -27,6 +27,7 @@ var tsPlugin = function (options) {
         compileFiles,
         handleDeclaration,
         files = [],
+
         // Files are compiled in this sub-directory
         compiledir = 'compiledir';
 
@@ -34,6 +35,7 @@ var tsPlugin = function (options) {
     if (!options) {
         options = {};
     }
+
     if (options.debug) {
         options.verbose = true;
     }
@@ -44,6 +46,7 @@ var tsPlugin = function (options) {
         if (file.isNull()) {
             return;
         }
+
         if (file.isStream()) {
             return this.emit('error', new PluginError('gulp-ts',  'Streaming not supported'));
         }
@@ -62,37 +65,44 @@ var tsPlugin = function (options) {
         // Construct a compile command to be used with the shell TypeScript compiler
         var compileCmd = '',
             // Path to the TypeScript binary
-            // TODO: We can't be certain about the location, find the path properly.
-            tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
+            // We can't be certain about the location, find the path properly.
+            tscPath = options.exePath || path.join(__dirname, 'node_modules/typescript/bin/tsc'),
             that = this,
+
             // The number of files read and pushed as File objects
-            filesRead = 0;
+            filesRead = 0,
+            globalExecutableUsed = false;
 
         // If tsc doesn't exist in the local node_modules
-        if (!shell.test('-f', tscPath)) {
+        if (options.global || !shell.test('-f', tscPath)) {
             // Try to find tsc from the system PATH, returns falsy if not found
             tscPath = shell.which('tsc');
+            globalExecutableUsed = true;
         }
 
         // tsc not found, abort
         if (!tscPath) {
             return this.emit('error', new PluginError('gulp-ts',
-                'Error, TypeScript compiler not found from node_modules or system PATH!\n'));
+                    'Error, TypeScript compiler not found from node_modules or system PATH!\n'));
         }
 
         // Basic options
         if (options.sourceMap) {
             compileCmd += ' --sourceMap';
         }
+
         if (options.declaration) {
             compileCmd += ' --declaration';
         }
+
         if (options.removeComments) {
             compileCmd += ' --removeComments';
         }
+
         if (options.noImplicitAny) {
             compileCmd += ' --noImplicitAny';
         }
+
         if (options.noResolve) {
             compileCmd += ' --noResolve';
         }
@@ -144,13 +154,17 @@ var tsPlugin = function (options) {
 
             // shell.exec returns { code: , output: }
             // silent is set to true to prevent console output
-            shell.exec(process.execPath + ' ' + tscPath + compileCmd, { silent: true }, function (code, output) {
+            var command = (globalExecutableUsed ? '' : '"' + process.execPath + '" ') +
+                '"' +  tscPath + '"' +
+                compileCmd;
+            shell.exec(command, { silent: true }, function (code, output) {
                 if (options.debug) {
                     log(' tsc output: [', output, ']');
                 }
+
                 if (code) {
                     return that.emit('error', new PluginError('gulp-ts',
-                        'Error during compilation!\n\n' + output));
+                            'Error during compilation!\n\n' + output));
                 }
 
                 var readSourceFile = function (relativePath, cwd, base) {
@@ -167,7 +181,7 @@ var tsPlugin = function (options) {
                             cwd: cwd,
                             base: base,
                             path: path.join(cwd, relativePath.replace('.ts', '.js')),
-                            contents: data
+                            contents: data,
                         }));
 
                         // Increase file counter
@@ -181,6 +195,7 @@ var tsPlugin = function (options) {
                                     if (err) {
                                         throw err;
                                     }
+
                                     // Return buffers
                                     that.emit('end');
                                     log('Compiling complete.');
@@ -222,17 +237,20 @@ var tsPlugin = function (options) {
             } else {
                 srcPath = files[0].path.replace('.ts', '.d.ts');
             }
+
             srcPath = path.relative(cwd, srcPath);
+
             // Read the generated file
             fs.readFile(path.join(__dirname, compiledir, srcPath), function (err, data) {
                 if (err) {
                     throw err;
                 }
+
                 // Buffer the file
                 fileConfig = {
                     base: path.dirname(srcPath),
                     path: srcPath,
-                    contents: data
+                    contents: data,
                 };
                 that.push(new File(fileConfig));
                 callback();
