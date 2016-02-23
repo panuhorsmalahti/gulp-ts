@@ -64,10 +64,9 @@ var tsPlugin = function(options) {
   compileFiles = function() {
     // Construct a compile command to be used with the shell TypeScript compiler
     var compileCmd = '',
-
         // Path to the TypeScript binary
         // TODO: We can't be certain about the location, find the path properly.
-        tscPath = path.join(__dirname, 'node_modules/typescript/bin/tsc'),
+        tscPath = options.exePath || path.join(__dirname, 'node_modules/typescript/bin/tsc'),
         that = this,
 
         // The number of files read and pushed as File objects
@@ -75,7 +74,8 @@ var tsPlugin = function(options) {
         globalExecutableUsed = false;
 
     // If tsc doesn't exist in the local node_modules
-    if (options.global || !shell.test('-f', tscPath)) {
+    if (options.global || !shell.test('-f', tscPath)
+    ) {
       // Try to find tsc from the system PATH, returns falsy if not found
       tscPath = shell.which('tsc');
       globalExecutableUsed = true;
