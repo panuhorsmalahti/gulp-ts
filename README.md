@@ -1,6 +1,11 @@
 gulp-ts
 =========
 
+deprecated!
+==========
+
+Switch to e.g. [gulp-typescript](https://www.npmjs.com/package/gulp-typescript).
+
 TypeScript compiler plugin for Gulp. Not actively maintained.
 
 First install gulp-ts
