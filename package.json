@@ -28,17 +28,19 @@
   ],
   "dependencies": {
     "through": "~2.3.8",
-    "shelljs": "~0.5.3",
+    "shelljs": "~0.6.0",
     "gulp-util": "~3.0.7",
-    "rimraf": "~2.4.4"
+    "rimraf": "~2.5.2"
   },
   "peerDependencies": {
-    "typescript": ">=0.9"
+    "typescript": "*",
+    "gulp": ">=3.0.0"
   },
   "devDependencies": {
-    "jslint": "~0.5.2",
-    "gulp-mocha": "~0.4.1",
-    "should": "~4.0.4"
+    "jslint": "~0.9.6",
+    "gulp-mocha": "~2.2.0",
+    "should": "~8.2.2",
+    "typescript": "~1.4.1"
   },
   "license": "MIT",
   "engines": {
